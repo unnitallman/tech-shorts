@@ -6,7 +6,32 @@ import sys
 
 
 def cmd_new(args: argparse.Namespace) -> int:
-    print(f"[new] slug={args.slug} (not yet implemented)")
+    from datetime import date
+    from pathlib import Path
+
+    slug = args.slug
+    today = date.today().isoformat()
+    path = Path("posts") / f"{today}-{slug}.md"
+    if path.exists():
+        print(f"error: {path} already exists", file=sys.stderr)
+        return 1
+
+    template = (
+        "---\n"
+        f'title: "TODO replace with real title"\n'
+        f"slug: {slug}\n"
+        "tags: []\n"
+        "cover_image: null\n"
+        "canonical: hashnode\n"
+        "series: null\n"
+        "published: false\n"
+        "---\n"
+        "\n"
+        "Write the post body here.\n"
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(template, encoding="utf-8")
+    print(f"created {path}")
     return 0
 
 
