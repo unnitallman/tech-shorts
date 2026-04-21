@@ -42,3 +42,15 @@ def test_extract_local_images_includes_cover():
     post = load_post(FIXTURE)
     imgs = extract_local_images(post)
     assert "images/sample-post/cover.png" in imgs
+
+
+def test_rewrite_images_for_api_replaces_local_paths():
+    from scripts.post import rewrite_images_for_api
+    from pathlib import Path
+
+    body = "![a](images/x/a.png) ![b](https://cdn/b.png)"
+    mapping = {"images/x/a.png": "https://cdn.hashnode.com/uploaded-a.png"}
+    out = rewrite_images_for_api(body, mapping)
+    assert "https://cdn.hashnode.com/uploaded-a.png" in out
+    assert "https://cdn/b.png" in out
+    assert "images/x/a.png" not in out

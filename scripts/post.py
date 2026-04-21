@@ -43,3 +43,11 @@ def extract_local_images(post: frontmatter.Post) -> list[str]:
             deduped.append(p)
             seen.add(p)
     return deduped
+
+
+def rewrite_images_for_api(body: str, mapping: dict[str, str]) -> str:
+    """Replace local image paths with uploaded CDN URLs. mapping: local_path -> cdn_url."""
+    out = body
+    for local_path, cdn_url in mapping.items():
+        out = out.replace(local_path, cdn_url)
+    return out
