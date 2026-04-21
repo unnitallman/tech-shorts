@@ -1,0 +1,14 @@
+# Local env
+.env
+
+# Gitignored scratch
+drafts/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store
