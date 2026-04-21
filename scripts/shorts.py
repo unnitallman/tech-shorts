@@ -203,7 +203,44 @@ def cmd_publish(args: argparse.Namespace) -> int:
 
 
 def cmd_status(args: argparse.Namespace) -> int:
-    print("[status] (not yet implemented)")
+    from pathlib import Path
+
+    from scripts.post import load_post
+    from scripts.state import State
+
+    posts_dir = Path("posts")
+    if not posts_dir.exists():
+        print("(no posts/ directory)")
+        return 0
+
+    state = State(Path(".state/published.json"))
+
+    rows: list[tuple[str, str, str, str]] = []
+    for p in sorted(posts_dir.glob("*.md")):
+        post = load_post(p)
+        slug = post.metadata["slug"]
+        is_published = bool(post.metadata.get("published"))
+        s = state.get(slug)
+        hn = s.get("hashnode", {})
+        dt = s.get("devto", {})
+
+        if is_published and hn.get("post_id"):
+            status = "published"
+        elif hn.get("draft_id") or hn.get("post_id"):
+            status = "draft"
+        else:
+            status = "unpublished"
+        hn_mark = "✓" if hn.get("post_id") or hn.get("draft_id") else "—"
+        dt_mark = "✓" if dt.get("post_id") else "—"
+        rows.append((p.name, status, hn_mark, dt_mark))
+
+    if not rows:
+        print("(no posts)")
+        return 0
+
+    w = max(len(r[0]) for r in rows) + 2
+    for name, status, hn_mark, dt_mark in rows:
+        print(f"{name:<{w}} {status:<12} hashnode {hn_mark}  devto {dt_mark}")
     return 0
 
 
